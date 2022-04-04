@@ -54,13 +54,14 @@
             <div class="form-group">
               <label for="title">Title</label>
               <input type="" class="form-control" id="title" aria-describedby="emailHelp">
-              <small id="emailHelp" class="form-text text-muted">Give a title to your list.</small>
+              <small id="title" class="form-text text-muted">Give a title to your list.</small>
             </div>
             <div class="form-group">
               <label for="description">Description</label>
               <textarea class="form-control" id="description" rows="3"></textarea>
             </div>
-            <button type="button" id="add" class="btn btn-primary">Add to list</button>
+            <button  id="add" class="btn btn-primary">Add to list</button>
+            <button  id="clear" class="btn btn-primary" onclick="deleteAlert()">Clear list</button>
           </form>
           <div id="item" class="my-4">
             <h2>Your Items</h2>
@@ -88,53 +89,84 @@
 
     <!-- Optional JavaScript; choose one of the two! -->
 
-    <!-- Option 1: jQuery and Bootstrap Bundle (includes Popper) -->
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-fQybjgWLrvvRgtW6bFlB7jaZrFsaBXjsOMm/tB9LTS58ONXgqbR9W8oWht/amnpF" crossorigin="anonymous"></script>
 
-    <!-- Option 2: Separate Popper and Bootstrap JS -->
-    <!--
-    <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.min.js" integrity="sha384-VHvPCCyXqtD5DqJeNxl2dtTyhF78xXNXdkwX1CZeRusQfRKp+tA7hAShOK/B/fQ2" crossorigin="anonymous"></script>
-    -->
 
     <script>
-      add = document.getElementById("add");
-      add.addEventListener("click", ()=>{
+
+      function getAndUpdate(){
         console.log("loading");
         tit = document.getElementById('title').value;
         desc = document.getElementById('description').value;
         if (localStorage.getItem('itemJson')==null){
           itemJsonArray = [];
           itemJsonArray.push([tit,desc]);
-          localStorage.setItem('itemJason', JSON.stringify(itemJsonArray));
+          localStorage.setItem('itemJson', JSON.stringify(itemJsonArray));
         }
         else{
-          itemJsonArrayStr = localStorage.getItem('itemJason');
-          itemJasonArray = Jason.parse(itemJasonArrayStr);
+          itemJsonArrayStr = localStorage.getItem('itemJson');
+          itemJsonArray = JSON.parse(itemJsonArrayStr);
           itemJsonArray.push([tit,desc]);
-          localStorage.setItem('itemJason', JSON.stringify(itemJsonArray));
+          localStorage.setItem('itemJson', JSON.stringify(itemJsonArray));
         }
+        update();
+      }
 
+      function update(){
+        if (localStorage.getItem('itemJson')==null){
+          itemJsonArray = [];
+          localStorage.setItem('itemJson', JSON.stringify(itemJsonArray));
+        }
+        else{
+          itemJsonArrayStr = localStorage.getItem('itemJson');
+          itemJsonArray = JSON.parse(itemJsonArrayStr);
+        }
+        
         // FILL THE TABLE
 
         let =   tableBody = document.getElementById("tableBody");
         let str = "";
-          itemJasonArray.forEach((element, index) => {
+          itemJsonArray.forEach((element, index) => {
             str += `
                  <tr>
                   <th scope="row">${index + 1}</th>
                   <td>${element[0]}</td>
                   <td>${element[1]}</td>
-                  <td>You need chai as per your need</td>
-                  <td><button class="btn btn-sm btn-primary">Delete</button></td>
+                  <td><button class="btn btn-sm btn-primary" onclick= "deleted(${index})">Delete</button></td>
                  </tr>`;
           });
 
           tableBody.innerHTML = str;
 
-      });
+        }
+      
+      add = document.getElementById("add");
+      add.addEventListener("click", getAndUpdate);
+      update();
+      function deleted(itemIndex){
+        itemJsonArrayStr = localStorage.getItem('itemJson');
+          itemJsonArray = JSON.parse(itemJsonArrayStr);
+
+          itemJsonArray.splice(itemIndex, 1);
+          localStorage.setItem('itemJson', JSON.stringify(itemJsonArray));
+
+          update();
+      }
+
+      function deleteAlert(){
+        var result = confirm("All your Items in the list will be deleted are you sure ?");
+
+        if (result) {
+          clearStorage();
+        } 
+        
+        }
+
+      function clearStorage(){
+        localStorage.clear();
+        update();
+      }
     </script>
   </body>
 </html>
